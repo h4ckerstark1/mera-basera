@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5743361d-b7a9-455f-8529-e3af2bd63e50" alt="Mera Basera Logo" width="300" />
+</p>
 
 <p align="center">
   <a href="https://mera-basera.netlify.app/">
