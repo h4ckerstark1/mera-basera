@@ -1,14 +1,3 @@
-🏠 Mera Basera
-
-Find a room. Find your place. Start your college journey.
-
-Mera Basera is a student-focused room & PG finder built for college students in India.
-
-Every year, thousands of students get admission into college and face one common problem:
-
-«"Where do I actually live?"»
-
-Mera Basera makes finding accommodation easier. Search your college name, explore available rooms and PGs, compare rent, distance, amenities and real photos — all from one place.
 
 <p align="center">
   <a href="https://mera-basera.netlify.app/">
@@ -29,7 +18,19 @@ Mera Basera makes finding accommodation easier. Search your college name, explor
   <a href="https://github.com/h4ckerstark1/mera-basera">
     <strong>⭐ GitHub Repository</strong>
   </a>
-</p>---
+</p>
+
+🏠 Mera Basera
+
+Find a room. Find your place. Start your college journey.
+
+Mera Basera is a student-focused room & PG finder built for college students in India.
+
+Every year, thousands of students get admission into college and face one common problem:
+
+«"Where do I actually live?"»
+
+Mera Basera makes finding accommodation easier. Search your college name, explore available rooms and PGs, compare rent, distance, amenities and real photos — all from one place.
 
 🎯 The Problem
 
