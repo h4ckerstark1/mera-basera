@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { sb, mapListingRow, seedListings } from '../lib/supabase';
+import { sb } from '../lib/supabase';
 import { useAuth } from '../lib/AuthContext';
 import ListingCard from '../components/ListingCard';
 import DetailModal from '../components/DetailModal';
@@ -27,14 +27,38 @@ export default function Home({ onNeedAuth }) {
   useEffect(() => { if (user) loadFavorites(); else setFavoriteIds(new Set()); }, [user]);
 
   async function loadListings() {
-    let { data } = await sb.from('listings').select('*').order('id');
-    if (data && data.length === 0) {
-      await sb.from('listings').insert(seedListings);
-      const res = await sb.from('listings').select('*').order('id');
-      data = res.data || [];
+  try {
+    const res = await fetch('http://localhost:5000/api/listings');
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch listings');
     }
-    setListings((data || []).map(mapListingRow));
+
+    const data = await res.json();
+
+    setListings(
+      data.map(row => ({
+        id: row.id,
+        college: row.collage,
+        city: row.city,
+        name: row.name,
+        type: row.room_type,
+        rent: Number(row.rent),
+        distance: row.distance_km,
+        amenities: row.amenities
+          ? String(row.amenities).split(',').map(s => s.trim()).filter(Boolean)
+          : [],
+        verified: row.verified,
+        phone: row.phone || '',
+        photoUrl: row.photo_url || null,
+        isPremium: row.is_premium || false,
+      }))
+    );
+  } catch (error) {
+    console.error('Failed to load listings:', error);
+    setListings([]);
   }
+}
 
   async function loadFeedback() {
     const { data } = await sb.from('feedback').select('*').eq('approved', true).order('id', { ascending: false });
@@ -69,7 +93,7 @@ export default function Home({ onNeedAuth }) {
   function runSearch() { setQuery(searchInput); }
   function quickSearch(name) { setSearchInput(name); setQuery(name); }
 
-  let filtered = listings;
+  let filtered = query ? listings : [];
   if (query) {
     const lower = query.toLowerCase();
     filtered = filtered.filter(r => r.college.toLowerCase().includes(lower) || r.city.toLowerCase().includes(lower));

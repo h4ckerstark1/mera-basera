@@ -16,24 +16,66 @@ export default function RegisterOwner() {
   async function submit(e) {
     e.preventDefault();
     setSaving(true);
-    let photoUrl = null;
-    if (photo) {
-      const ext = photo.name.split('.').pop();
-      const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: upErr } = await sb.storage.from('room-photos').upload(path, photo);
-      if (!upErr) {
-        const { data } = sb.storage.from('room-photos').getPublicUrl(path);
-        photoUrl = data.publicUrl;
+    console.log("PHOTO SELECTED:", photo);
+
+    try {
+      let photoUrl = null;
+
+      // Upload room photo to Supabase Storage
+      if (photo) {
+        const ext = photo.name.split('.').pop().toLowerCase();
+        const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { error: uploadError } = await sb.storage
+          .from('room-photos')
+          .upload(path, photo);
+
+        if (uploadError) {
+          throw new Error(`Photo upload failed: ${uploadError.message}`);
+        }
+
+        const { data: publicUrlData } = sb.storage
+          .from('room-photos')
+          .getPublicUrl(path);
+
+        photoUrl = publicUrlData.publicUrl;
       }
+
+      // Save listing through our Node.js backend
+      const response = await fetch('http://localhost:5000/api/listings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: form.name,
+          collage: form.college,
+          city: form.city,
+          room_type: form.type,
+          rent: parseInt(form.rent, 10),
+          distance_km: parseFloat(form.distance),
+          amenities: amenities.length ? amenities.join(',') : 'WiFi',
+          phone: form.phone,
+          verified: false,
+          photo_url: photoUrl,
+          is_premium: false,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to register property');
+      }
+
+      console.log('Listing created:', data);
+      setSuccess(true);
+    } catch (error) {
+      console.error('Register property error:', error);
+      alert(`Failed to register property: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
-    await sb.from('listings').insert({
-      college: form.college, city: form.city, name: form.name,
-      room_type: form.type, rent: parseInt(form.rent), distance_km: parseFloat(form.distance),
-      amenities: amenities.length ? amenities.join(',') : 'WiFi',
-      verified: false, is_premium: false, phone: form.phone, photo_url: photoUrl,
-    });
-    setSaving(false);
-    setSuccess(true);
   }
 
   return (
@@ -82,7 +124,7 @@ export default function RegisterOwner() {
                   </div>
                 </div>
                 <div className="form-group"><label>WhatsApp number (students will contact you here)</label><input required value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="e.g. 919999999999" /></div>
-                <div className="form-group"><label>Photo of the room (optional, but helps a lot!)</label><input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} /></div>
+                <div className="form-group"><label>Photo of the room (optional, but helps a lot!)</label><input type="file" accept="image/*" onChange={e => { console.log("PHOTO INPUT:", e.target.files[0]); setPhoto(e.target.files[0]); }} /></div>
                 <button type="submit" className="btn-submit" disabled={saving}>{saving ? 'Saving...' : 'Register property'}</button>
               </form>
             </>
