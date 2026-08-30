@@ -16,4 +16,13 @@ pool.on("error", (err) => {
   console.error("❌ Unexpected PostgreSQL pool error:", err.message);
 });
 
-module.exports = pool;
+async function query(text, params) {
+  return pool.query(text, params);
+}
+
+async function checkConnection() {
+  const res = await query("SELECT NOW() as now");
+  return res.rows[0].now;
+}
+
+module.exports = { pool, query, checkConnection };
