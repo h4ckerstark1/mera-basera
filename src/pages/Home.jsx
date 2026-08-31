@@ -28,7 +28,7 @@ export default function Home({ onNeedAuth }) {
 
   async function loadListings() {
   try {
-    const res = await fetch('https://mera-basera.onrender.com/api/listings');
+    const res = await fetch('https://mera-basera-backend.onrender.com/api/listings');
 
     if (!res.ok) {
       throw new Error('Failed to fetch listings');

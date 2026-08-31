@@ -42,7 +42,7 @@ export default function RegisterOwner() {
       }
 
       // Save listing through our Node.js backend
-      const response = await fetch('https://mera-basera.onrender.com/api/listings', {
+      const response = await fetch('https://mera-basera-backend.onrender.com/api/listings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
