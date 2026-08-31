@@ -42,6 +42,26 @@ setLoading(false);
 onClose();
   }
 
+  async function handleLogin(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const { error: err } = await sb.auth.signInWithPassword({
+      email: liEmail,
+      password: liPassword,
+    });
+
+    setLoading(false);
+
+    if (err) {
+      setError(err.message);
+      return;
+    }
+
+    onClose();
+  }
+
   return (
     <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 440 }}>
