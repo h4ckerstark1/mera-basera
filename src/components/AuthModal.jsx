@@ -20,33 +20,26 @@ export default function AuthModal({ open, onClose }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const { data, error: err } = await sb.auth.signUp({ email: suEmail, password: suPassword });
-    if (err) {
-      setError(err.message);
-      setLoading(false);
-      return;
-    }
-    if (data.user) {
-      await sb.from('profiles').insert({
-        id: data.user.id,
-        role,
-        name: suName,
-        college_or_business: suCollege,
-        phone: null,
-      });
-    }
-    setLoading(false);
-    onClose();
-  }
+    const { error: err } = await sb.auth.signUp({
+  email: suEmail,
+  password: suPassword,
+  options: {
+    data: {
+      role,
+      name: suName,
+      college_or_business: suCollege,
+    },
+  },
+});
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    const { error: err } = await sb.auth.signInWithPassword({ email: liEmail, password: liPassword });
-    setLoading(false);
-    if (err) { setError(err.message); return; }
-    onClose();
+if (err) {
+  setError(err.message);
+  setLoading(false);
+  return;
+}
+
+setLoading(false);
+onClose();
   }
 
   return (
