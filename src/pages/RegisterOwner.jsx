@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { sb } from '../lib/supabase';
+import { useAuth } from '../lib/AuthContext';
 
 export default function RegisterOwner() {
+  const { user, profile, loading } = useAuth();
   const [form, setForm] = useState({ name: '', college: '', city: '', distance: '', type: 'Single', rent: '', phone: '' });
   const [amenities, setAmenities] = useState([]);
   const [photo, setPhoto] = useState(null);
@@ -16,36 +18,27 @@ export default function RegisterOwner() {
   async function submit(e) {
     e.preventDefault();
     setSaving(true);
-    console.log("PHOTO SELECTED:", photo);
 
     try {
       let photoUrl = null;
 
-      // Upload room photo to Supabase Storage
       if (photo) {
         const ext = photo.name.split('.').pop().toLowerCase();
         const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-
-        const { error: uploadError } = await sb.storage
-          .from('room-photos')
-          .upload(path, photo);
-
-        if (uploadError) {
-          throw new Error(`Photo upload failed: ${uploadError.message}`);
-        }
-
-        const { data: publicUrlData } = sb.storage
-          .from('room-photos')
-          .getPublicUrl(path);
-
+        const { error: uploadError } = await sb.storage.from('room-photos').upload(path, photo);
+        if (uploadError) throw new Error(`Photo upload failed: ${uploadError.message}`);
+        const { data: publicUrlData } = sb.storage.from('room-photos').getPublicUrl(path);
         photoUrl = publicUrlData.publicUrl;
       }
 
-      // Save listing through our Node.js backend
+      const { data: sessionData } = await sb.auth.getSession();
+      const token = sessionData.session?.access_token;
+
       const response = await fetch('https://mera-basera-backend.onrender.com/api/listings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name,
@@ -56,19 +49,13 @@ export default function RegisterOwner() {
           distance_km: parseFloat(form.distance),
           amenities: amenities.length ? amenities.join(',') : 'WiFi',
           phone: form.phone,
-          verified: false,
           photo_url: photoUrl,
-          is_premium: false,
         }),
       });
 
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to register property');
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to register property');
-      }
-
-      console.log('Listing created:', data);
       setSuccess(true);
     } catch (error) {
       console.error('Register property error:', error);
@@ -76,6 +63,30 @@ export default function RegisterOwner() {
     } finally {
       setSaving(false);
     }
+  }
+
+  if (loading) return null;
+
+  if (!user || profile?.role !== 'Owner') {
+    return (
+      <>
+        <nav>
+          <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
+            <div className="logo-mark">M</div>
+            <div>Mera Basera<span className="logo-sub">STUDENT ROOM &amp; PG FINDER</span></div>
+          </Link>
+          <Link to="/" className="back">← Back to search</Link>
+        </nav>
+        <div className="page-wrap">
+          <div className="empty-state">
+            <h3 style={{ marginBottom: 8 }}>Owner login required</h3>
+            <p>Please sign up or log in as an Owner from the homepage to register a property.</p>
+            <p style={{ marginTop: 14 }}><Link to="/">← Go to homepage</Link></p>
+          </div>
+        </div>
+        <footer>Mera Basera — Student Room &amp; PG Finder.</footer>
+      </>
+    );
   }
 
   return (
@@ -124,7 +135,7 @@ export default function RegisterOwner() {
                   </div>
                 </div>
                 <div className="form-group"><label>WhatsApp number (students will contact you here)</label><input required value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="e.g. 919999999999" /></div>
-                <div className="form-group"><label>Photo of the room (optional, but helps a lot!)</label><input type="file" accept="image/*" onChange={e => { console.log("PHOTO INPUT:", e.target.files[0]); setPhoto(e.target.files[0]); }} /></div>
+                <div className="form-group"><label>Photo of the room (optional, but helps a lot!)</label><input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} /></div>
                 <button type="submit" className="btn-submit" disabled={saving}>{saving ? 'Saving...' : 'Register property'}</button>
               </form>
             </>
@@ -133,7 +144,7 @@ export default function RegisterOwner() {
               <div className="tick">✅</div>
               <h3>Registered!</h3>
               <p>Your property has been added to Mera Basera. Students searching your college will now see your listing.</p>
-              <Link to="/">Go to homepage</Link>
+              <Link to="/owner-dashboard">Go to My Dashboard</Link>
             </div>
           )}
         </div>

@@ -5,6 +5,7 @@ import AuthModal from './components/AuthModal';
 import Home from './pages/Home';
 import RegisterOwner from './pages/RegisterOwner';
 import Dashboard from './pages/Dashboard';
+import OwnerDashboard from './pages/OwnerDashboard';
 import { useState } from 'react';
 
 function HomeWithNav() {
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<HomeWithNav />} />
           <Route path="/register-owner" element={<RegisterOwner />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
