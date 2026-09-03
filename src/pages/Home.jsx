@@ -215,7 +215,7 @@ export default function Home({ onNeedAuth }) {
       <footer>Mera Basera — Student Room &amp; PG Finder.</footer>
 
       {selectedListing && <DetailModal listing={selectedListing} onClose={() => setSelectedListing(null)} />}
-      <RoommateModal open={roommateOpen} onClose={() => setRoommateOpen(false)} />
+      <RoommateModal open={roommateOpen} onClose={() => setRoommateOpen(false)} onNeedAuth={onNeedAuth} />
 
       {fbOpen && (
         <div className="overlay open" onClick={(e) => e.target === e.currentTarget && setFbOpen(false)}>

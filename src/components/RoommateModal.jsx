@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { sb, mapRoommateRow, seedRoommates } from '../lib/supabase';
+import { useAuth } from '../lib/AuthContext';
 
-export default function RoommateModal({ open, onClose }) {
+export default function RoommateModal({ open, onClose, onNeedAuth }) {
+  const { user } = useAuth();
   const [tab, setTab] = useState('browse');
   const [roommates, setRoommates] = useState([]);
   const [success, setSuccess] = useState(false);
@@ -21,11 +23,27 @@ export default function RoommateModal({ open, onClose }) {
     setRoommates((data || []).map(mapRoommateRow));
   }
 
+  function goToAddTab() {
+    if (!user) {
+      onClose();
+      onNeedAuth();
+      return;
+    }
+    setTab('add');
+    setSuccess(false);
+  }
+
   async function submit(e) {
     e.preventDefault();
+    if (!user) {
+      onClose();
+      onNeedAuth();
+      return;
+    }
     await sb.from('roommates').insert({
       name: form.name, college: form.college, budget: parseInt(form.budget),
       gender: form.gender, preferences: form.prefs, phone: form.phone,
+      user_id: user.id,
     });
     setSuccess(true);
     setForm({ name: '', college: '', budget: '', gender: 'Male', prefs: '', phone: '' });
@@ -44,7 +62,7 @@ export default function RoommateModal({ open, onClose }) {
         </div>
         <div className="rm-tabs">
           <div className={`rm-tab ${tab === 'browse' ? 'active' : ''}`} onClick={() => setTab('browse')}>Browse</div>
-          <div className={`rm-tab ${tab === 'add' ? 'active' : ''}`} onClick={() => { setTab('add'); setSuccess(false); }}>Add myself</div>
+          <div className={`rm-tab ${tab === 'add' ? 'active' : ''}`} onClick={goToAddTab}>Add myself</div>
         </div>
 
         {tab === 'browse' && (
