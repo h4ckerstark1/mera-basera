@@ -1,10 +1,35 @@
 import { iconFor } from '../lib/supabase';
+import { sb } from '../lib/supabase';
+import { useAuth } from '../lib/AuthContext';
 
 export default function DetailModal({ listing, onClose }) {
+  const { user } = useAuth();
+
   if (!listing) return null;
   const r = listing;
   const fillPct = Math.min(100, (r.distance / 3) * 100);
   const minutes = Math.max(2, Math.round(r.distance * 12));
+
+  async function handleWhatsAppClick() {
+    if (!user) return;
+
+    const { error } = await sb
+      .from('contact_history')
+      .upsert(
+        {
+          user_id: user.id,
+          listing_id: r.id,
+          contacted_at: new Date().toISOString()
+        },
+        {
+          onConflict: 'user_id,listing_id'
+        }
+      );
+
+    if (error) {
+      console.error('Contact history save error:', error);
+    }
+  }
 
   return (
     <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -39,7 +64,9 @@ export default function DetailModal({ listing, onClose }) {
             <a
               className="btn-contact"
               href={`https://wa.me/${r.phone}?text=Hi%2C%20I%27d%20like%20more%20information%20about%20${encodeURIComponent(r.name)}`}
-              target="_blank" rel="noreferrer"
+              target="_blank"
+              rel="noreferrer"
+              onClick={handleWhatsAppClick}
             >
               Contact on WhatsApp
             </a>

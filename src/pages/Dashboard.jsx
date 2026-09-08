@@ -12,12 +12,57 @@ export default function Dashboard() {
   const [rmForm, setRmForm] = useState({ name: '', college: '', budget: '', gender: 'Male', preferences: '', phone: '' });
   const [savingRoommate, setSavingRoommate] = useState(false);
 
+  const [subscription, setSubscription] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [contactHistory, setContactHistory] = useState([]);
+  const [contactHistoryLoading, setContactHistoryLoading] = useState(true);
+
+  async function loadSubscription() {
+    setSubscriptionLoading(true);
+
+  const { data, error } = await sb
+    .from('subscriptions')
+    .select('plan, status, started_at, expires_at')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Subscription load error:', error);
+    setSubscription(null);
+  } else {
+    setSubscription(data || null);
+  }
+
+  setSubscriptionLoading(false);
+}
+
   useEffect(() => {
-    if (user) {
-      loadFavorites();
-      loadMyRoommateListing();
+  if (user) {
+    loadFavorites();
+    loadMyRoommateListing();
+    loadSubscription();
+    loadContactHistory();
+  }
+}, [user]);
+
+  async function loadContactHistory() {
+    setContactHistoryLoading(true);
+
+    const { data, error } = await sb
+      .from('contact_history')
+      .select('listing_id, contacted_at, listings(*)')
+      .eq('user_id', user.id)
+      .order('contacted_at', { ascending: false });
+
+    if (error) {
+      console.error('Contact history load error:', error);
+      setContactHistory([]);
+    } else {
+      setContactHistory(data || []);
     }
-  }, [user]);
+
+    setContactHistoryLoading(false);
+  }
 
   async function loadFavorites() {
     setFetching(true);
@@ -100,6 +145,25 @@ export default function Dashboard() {
                 <h1>{profile ? profile.name : user.email}</h1>
                 <span className="role-tag">{profile ? profile.role : '—'}</span>
                 <p>{profile && profile.college_or_business ? profile.college_or_business : user.email}</p>
+
+                 {!subscriptionLoading && subscription && (
+                    <div style={{ marginTop: 10 }}>
+                         <span
+                          className="role-tag"
+                          style={{
+                             background: subscription.plan === 'pro' ? '#111' : '#eee',
+                             color: subscription.plan === 'pro' ? '#fff' : '#333'
+                            }}
+                           >
+                             {subscription.plan === 'pro' ? '⭐ PRO PLAN' : '🆓 FREE PLAN'}
+                            </span>
+
+
+                            <div style={{ marginTop: 6, fontSize: '0.85rem', color: '#777' }}>
+                               Status: {subscription.status}
+                         </div>
+                      </div>
+                    )}
               </div>
               <button className="logout-btn" onClick={logout}>Logout</button>
             </div>
@@ -132,6 +196,55 @@ export default function Dashboard() {
                         <div className="fav-actions">
                           <a className="btn-contact" href={`https://wa.me/${l.phone || '919999999999'}?text=Hi%2C%20I%27d%20like%20more%20information%20about%20${encodeURIComponent(l.name)}`} target="_blank" rel="noreferrer">WhatsApp</a>
                           <button className="btn-unsave" onClick={() => removeFavorite(l.id)} title="Remove">✕</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="section-head">
+              <h2>📞 Contact History</h2>
+              <div className="count">{contactHistory.length} contacted</div>
+            </div>
+
+            {contactHistoryLoading ? null : contactHistory.length === 0 ? (
+              <div className="empty-state">
+                <h3 style={{ marginBottom: 8 }}>No contact history yet</h3>
+                <p>When you contact a room owner on WhatsApp, it will appear here.</p>
+              </div>
+            ) : (
+              <div className="fav-grid" style={{ marginBottom: 40 }}>
+                {contactHistory.map(item => {
+                  const l = item.listings;
+                  if (!l) return null;
+
+                  return (
+                    <div className="fav-card" key={item.listing_id}>
+                      {l.photo_url
+                        ? <img src={l.photo_url} className="fav-photo" alt="" />
+                        : <div className="fav-photo-placeholder">M</div>}
+
+                      <div className="fav-body">
+                        <h3>{l.name}</h3>
+                        <div className="locality">{l.collage}, {l.city}</div>
+                        <div className="price">
+                          ₹{Number(l.rent).toLocaleString('en-IN')}
+                          <span style={{ fontSize: '0.7rem', fontWeight: 400, color: '#888' }}> /month</span>
+                        </div>
+                        <div className="locality" style={{ marginTop: 6 }}>
+                          Contacted on {new Date(item.contacted_at).toLocaleDateString('en-IN')}
+                        </div>
+                        <div className="fav-actions">
+                          <a
+                            className="btn-contact"
+                            href={`https://wa.me/${l.phone || '919999999999'}?text=Hi%2C%20I%27d%20like%20more%20information%20about%20${encodeURIComponent(l.name)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            WhatsApp
+                          </a>
                         </div>
                       </div>
                     </div>

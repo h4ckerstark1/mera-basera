@@ -71,17 +71,57 @@ export default function Home({ onNeedAuth }) {
   }
 
   async function toggleFavorite(listingId) {
-    if (!user) { onNeedAuth(); return; }
-    const next = new Set(favoriteIds);
-    if (next.has(listingId)) {
-      await sb.from('favorites').delete().eq('user_id', user.id).eq('listing_id', listingId);
-      next.delete(listingId);
-    } else {
-      await sb.from('favorites').insert({ user_id: user.id, listing_id: listingId });
-      next.add(listingId);
-    }
-    setFavoriteIds(next);
+  if (!user) {
+    onNeedAuth();
+    return;
   }
+
+  const { data: subscription } = await sb
+    .from('subscriptions')
+    .select('plan, status')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  const next = new Set(favoriteIds);
+
+  // Already saved → allow removing
+  if (next.has(listingId)) {
+    await sb
+      .from('favorites')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('listing_id', listingId);
+
+    next.delete(listingId);
+    setFavoriteIds(next);
+    return;
+  }
+
+  // Free users → maximum 5 favorites
+  if (
+    (subscription?.plan !== 'pro' || subscription?.status !== 'active') &&
+    next.size >= 5
+  ) {
+    alert('Free plan mein maximum 5 listings save kar sakte ho. Unlimited favorites ke liye Pro plan lein.');
+    return;
+  }
+
+  const { error } = await sb
+    .from('favorites')
+    .insert({
+      user_id: user.id,
+      listing_id: listingId
+    });
+
+  if (error) {
+    console.error('Failed to save favorite:', error);
+    alert('Favorite save nahi ho paya. Please try again.');
+    return;
+  }
+
+  next.add(listingId);
+  setFavoriteIds(next);
+}
 
   async function submitFeedback(e) {
     e.preventDefault();
