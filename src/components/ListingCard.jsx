@@ -1,5 +1,4 @@
 import { iconFor } from '../lib/supabase';
-
 export default function ListingCard({ listing, index, isFavorited, onToggleFavorite, onClick }) {
   const r = listing;
   return (
@@ -8,7 +7,6 @@ export default function ListingCard({ listing, index, isFavorited, onToggleFavor
       style={{ animationDelay: `${Math.min(index * 0.06, 0.5)}s` }}
       onClick={() => onClick(r.id)}
     >
-      {r.photoUrl && <img src={r.photoUrl} alt={r.name} className="card-photo" />}
       <div className="card-top">
         <div className="punch-hole"></div>
         <div className="badges-stack">
