@@ -14,9 +14,44 @@ export default function Home({ onNeedAuth }) {
   const [budget, setBudget] = useState('');
   const [roomType, setRoomType] = useState('');
   const [verifiedOnly, setVerifiedOnly] = useState('');
+ const [maxDistance, setMaxDistance] = useState('');
+ const [subscription, setSubscription] = useState(null);
+ const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+ const [minRent, setMinRent] = useState('');
+ const [maxRent, setMaxRent] = useState('');
+ const [selectedAmenities, setSelectedAmenities] = useState([]);
+ const [sortBy, setSortBy] = useState('premium');
+ const [premiumVerified, setPremiumVerified] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [selectedListing, setSelectedListing] = useState(null);
   const [roommateOpen, setRoommateOpen] = useState(false);
+ useEffect(() => {
+ async function loadSubscription() {
+ if (!user) {
+ setSubscription(null);
+ setSubscriptionLoading(false);
+ return;
+ }
+
+ setSubscriptionLoading(true);
+ const { data, error } = await sb
+ .from('subscriptions')
+ .select('plan, status')
+ .eq('user_id', user.id)
+ .maybeSingle();
+
+ if (error) {
+ console.error('Subscription load error:', error);
+ setSubscription(null);
+ } else {
+ setSubscription(data || null);
+ }
+
+ setSubscriptionLoading(false);
+ }
+
+ loadSubscription();
+ }, [user]);
 
   const [feedback, setFeedback] = useState([]);
   const [fbForm, setFbForm] = useState({ name: '', role: 'Student', message: '' });
@@ -25,40 +60,31 @@ export default function Home({ onNeedAuth }) {
 
   useEffect(() => { loadListings(); loadFeedback(); }, []);
   useEffect(() => { if (user) loadFavorites(); else setFavoriteIds(new Set()); }, [user]);
-
-  async function loadListings() {
-  try {
-    const res = await fetch('https://mera-basera-backend.onrender.com/api/listings');
-
-    if (!res.ok) {
-      throw new Error('Failed to fetch listings');
-    }
-
-    const data = await res.json();
-
-    setListings(
-      data.map(row => ({
-        id: row.id,
-        college: row.collage,
-        city: row.city,
-        name: row.name,
-        type: row.room_type,
-        rent: Number(row.rent),
-        distance: row.distance_km,
-        amenities: row.amenities
-          ? String(row.amenities).split(',').map(s => s.trim()).filter(Boolean)
-          : [],
-        verified: row.verified,
-        phone: row.phone || '',
-        photoUrl: row.photo_url || null,
-        isPremium: row.is_premium || false,
-      }))
-    );
-  } catch (error) {
-    console.error('Failed to load listings:', error);
-    setListings([]);
-  }
-}
+ async function loadListings() {
+ try {
+ const res = await fetch("http://localhost:5000/api/listings");
+ if (!res.ok) throw new Error("Failed to fetch listings");
+ const data = await res.json();
+ console.log("LISTINGS FROM BACKEND:", data);
+ setListings(data.map(row => ({
+ id: row.id,
+ college: row.collage,
+ city: row.city,
+ name: row.name,
+ type: row.room_type,
+ rent: Number(row.rent),
+ distance: Number(row.distance_km) || 0,
+ amenities: Array.isArray(row.amenities_json) ? row.amenities_json : (row.amenities ? String(row.amenities).split(",").map(s => s.trim()).filter(Boolean) : []),
+ verified: row.verified === true,
+ isPremium: row.is_premium === true,
+ phone: row.phone || "",
+ photoUrl: row.photo_url || null,
+ })));
+ } catch (error) {
+ console.error("Failed to load listings:", error);
+ setListings([]);
+ }
+ }
 
   async function loadFeedback() {
     const { data } = await sb.from('feedback').select('*').eq('approved', true).order('id', { ascending: false });
@@ -129,6 +155,7 @@ export default function Home({ onNeedAuth }) {
     setFbSuccess(true);
     setFbForm({ name: '', role: 'Student', message: '' });
   }
+ const isPro = subscription?.plan === "pro" && subscription?.status === "active";
 
   function runSearch() { setQuery(searchInput); }
   function quickSearch(name) { setSearchInput(name); setQuery(name); }
@@ -141,7 +168,24 @@ export default function Home({ onNeedAuth }) {
   if (budget) filtered = filtered.filter(r => r.rent <= parseInt(budget));
   if (roomType) filtered = filtered.filter(r => r.type === roomType);
   if (verifiedOnly) filtered = filtered.filter(r => r.verified);
-  filtered = [...filtered].sort((a, b) => (b.isPremium === true) - (a.isPremium === true));
+ if (subscription?.plan === "pro" && subscription?.status === "active" && premiumVerified) filtered = filtered.filter(r => r.verified && r.isPremium);
+ if (subscription?.plan === "pro" && subscription?.status === "active" && maxDistance) filtered = filtered.filter(r => r.distance <= Number(maxDistance));
+ if (subscription?.plan === "pro" && subscription?.status === "active") {
+ if (selectedAmenities.length > 0) filtered = filtered.filter(r => selectedAmenities.every(a => r.amenities.includes(a)));
+ if (minRent) filtered = filtered.filter(r => r.rent >= Number(minRent));
+ if (maxRent) filtered = filtered.filter(r => r.rent <= Number(maxRent));
+ }
+  if (sortBy === "rent_low") {
+  filtered = [...filtered].sort((a, b) => a.rent - b.rent);
+} else if (sortBy === "rent_high") {
+  filtered = [...filtered].sort((a, b) => b.rent - a.rent);
+} else if (sortBy === "distance") {
+  filtered = [...filtered].sort((a, b) => a.distance - b.distance);
+} else {
+  filtered = [...filtered].sort(
+    (a, b) => (b.isPremium === true) - (a.isPremium === true)
+  );
+}
 
   return (
     <>
@@ -200,6 +244,161 @@ export default function Home({ onNeedAuth }) {
             <option value="yes">Verified only</option>
           </select>
         </div>
+        {subscription?.plan === "pro" && subscription?.status === "active" && (
+          <div className="pro-filters">
+            <div className="pro-filter-title">⭐ Pro Advanced Filters</div>
+
+            <input
+              type="number"
+              min="0"
+              placeholder="Min rent ₹"
+              value={minRent}
+              onChange={e => setMinRent(e.target.value)}
+            />
+
+            <input
+              type="number"
+              min="0"
+              placeholder="Max rent ₹"
+              value={maxRent}
+              onChange={e => setMaxRent(e.target.value)}
+            />
+
+            <select
+              value={maxDistance}
+              onChange={e => setMaxDistance(e.target.value)}
+            >
+              <option value="">Distance — any</option>
+              <option value="1">Within 1 km</option>
+              <option value="2">Within 2 km</option>
+              <option value="5">Within 5 km</option>
+              <option value="10">Within 10 km</option>
+            </select>
+
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+            >
+              <option value="premium">Premium first</option>
+              <option value="rent_low">Rent: Low to High</option>
+              <option value="rent_high">Rent: High to Low</option>
+              <option value="distance">Distance: Nearest First</option>
+            </select>
+
+            <div className="amenities-filter">
+      <div className="amenities-title">Amenities</div>
+
+      {[
+        {
+          category: "🛏️ Room & Furniture",
+          items: [
+            "Bed",
+            "Study Table",
+            "Wardrobe",
+            "Furnished",
+            "Attached Bathroom",
+            "Fan",
+            "AC",
+            "Geyser",
+            "Balcony",
+            "TV"
+          ]
+        },
+        {
+          category: "🍳 Food & Kitchen",
+          items: [
+            "Wi-Fi",
+            "Food Included",
+            "Breakfast",
+            "Kitchen Access",
+            "Refrigerator",
+            "RO/Drinking Water",
+            "Cooking Allowed",
+            "Washing Machine"
+          ]
+        },
+        {
+          category: "🛡️ Safety & Security",
+          items: [
+            "CCTV",
+            "Security Guard",
+            "Secure Entry",
+            "Power Backup",
+            "Fire Safety",
+            "24×7 Entry"
+          ]
+        },
+        {
+          category: "🅿️ Parking & Location",
+          items: [
+            "Bike Parking",
+            "Car Parking",
+            "Lift",
+            "Near Public Transport",
+            "Near College",
+            "Nearby Shops/Market"
+          ]
+        },
+        {
+          category: "🧹 Services",
+          items: [
+            "Housekeeping",
+            "Laundry Service",
+            "Regular Cleaning",
+            "Hot Water",
+            "Common Area",
+            "Garden/Terrace"
+          ]
+        },
+        {
+          category: "🎓 Student Friendly",
+          items: [
+            "Study Room",
+            "Quiet Hours",
+            "Visitors Allowed",
+            "No Curfew",
+            "Short-Term Stay",
+            "Room Sharing Allowed"
+          ]
+        },
+        {
+          category: "⭐ Premium / Extra",
+          items: [
+            "Video Tour",
+            "Multiple Photos",
+            "Exact Location",
+            "Verified Property",
+            "Availability Status",
+            "Fast Owner Response"
+          ]
+        }
+      ].map(group => (
+        <div className="amenity-group" key={group.category}>
+          <div className="amenity-group-title">{group.category}</div>
+
+          <div className="amenity-group-items">
+            {group.items.map(amenity => (
+              <label key={amenity}>
+                <input
+                  type="checkbox"
+                  checked={selectedAmenities.includes(amenity)}
+                  onChange={() => {
+                    setSelectedAmenities(prev =>
+                      prev.includes(amenity)
+                        ? prev.filter(item => item !== amenity)
+                        : [...prev, amenity]
+                    );
+                  }}
+                />
+                {amenity}
+              </label>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+          </div>
+        )}
         <div className="grid">
           {filtered.length === 0 ? (
             <div className="no-results" style={{ gridColumn: '1/-1' }}>
