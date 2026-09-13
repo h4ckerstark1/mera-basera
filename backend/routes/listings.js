@@ -4,6 +4,21 @@ const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
+function normalizeAmenities(amenities) {
+  if (Array.isArray(amenities)) {
+    return amenities.filter(Boolean).map(String);
+  }
+
+  if (typeof amenities === "string") {
+    return amenities
+      .split(",")
+      .map(item => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
 // GET /api/listings — public
 router.get("/", async (req, res) => {
   try {
@@ -44,8 +59,9 @@ router.get("/", async (req, res) => {
     }
 
     let query = `
-      SELECT id, created_at, name, collage, city, room_type, rent, distance_km,
-             amenities, phone, verified, photo_url, is_premium
+      SELECT id, created_at, name, collage, city, room_type, rent,
+             distance_km, amenities, amenities_json, phone, verified,
+             photo_url, is_premium
       FROM listings
     `;
 
@@ -69,8 +85,8 @@ router.get("/mine", requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, created_at, name, collage, city, room_type, rent,
-              distance_km, amenities, phone, verified, photo_url,
-              is_premium, owner_id
+              distance_km, amenities, amenities_json, phone, verified,
+              photo_url, is_premium, owner_id
        FROM listings
        WHERE owner_id = $1
        ORDER BY created_at DESC`,
@@ -98,8 +114,8 @@ router.get("/:id", async (req, res) => {
 
     const result = await pool.query(
       `SELECT id, created_at, name, collage, city, room_type, rent,
-              distance_km, amenities, phone, verified, photo_url,
-              is_premium
+              distance_km, amenities, amenities_json, phone, verified,
+              photo_url, is_premium
        FROM listings
        WHERE id = $1`,
       [id]
@@ -155,11 +171,14 @@ router.post("/", requireAuth, async (req, res) => {
       });
     }
 
+    const normalizedAmenities = normalizeAmenities(amenities);
+
     const result = await pool.query(
       `INSERT INTO listings
         (name, collage, city, room_type, rent, distance_km,
-         amenities, phone, verified, photo_url, is_premium, owner_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,false,$9,false,$10)
+         amenities, amenities_json, phone, verified, photo_url,
+         is_premium, owner_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,false,$10,false,$11)
        RETURNING *`,
       [
         name,
@@ -168,7 +187,10 @@ router.post("/", requireAuth, async (req, res) => {
         room_type,
         rent,
         distance_km ?? null,
-        amenities ?? null,
+        normalizedAmenities.length
+          ? normalizedAmenities.join(",")
+          : null,
+        JSON.stringify(normalizedAmenities),
         phone ?? null,
         photo_url ?? null,
         req.user.id
@@ -223,6 +245,8 @@ router.put("/:id", requireAuth, async (req, res) => {
       photo_url
     } = req.body;
 
+    const normalizedAmenities = normalizeAmenities(amenities);
+
     const result = await pool.query(
       `UPDATE listings
        SET name = COALESCE($1, name),
@@ -232,9 +256,10 @@ router.put("/:id", requireAuth, async (req, res) => {
            rent = COALESCE($5, rent),
            distance_km = COALESCE($6, distance_km),
            amenities = COALESCE($7, amenities),
-           phone = COALESCE($8, phone),
-           photo_url = COALESCE($9, photo_url)
-       WHERE id = $10
+           amenities_json = COALESCE($8, amenities_json),
+           phone = COALESCE($9, phone),
+           photo_url = COALESCE($10, photo_url)
+       WHERE id = $11
        RETURNING *`,
       [
         name,
@@ -243,7 +268,10 @@ router.put("/:id", requireAuth, async (req, res) => {
         room_type,
         rent,
         distance_km,
-        amenities,
+        normalizedAmenities.length
+          ? normalizedAmenities.join(",")
+          : null,
+        JSON.stringify(normalizedAmenities),
         phone,
         photo_url,
         id

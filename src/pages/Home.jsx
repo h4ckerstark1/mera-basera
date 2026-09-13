@@ -62,10 +62,15 @@ export default function Home({ onNeedAuth }) {
   useEffect(() => { if (user) loadFavorites(); else setFavoriteIds(new Set()); }, [user]);
  async function loadListings() {
  try {
- const res = await fetch("http://localhost:5000/api/listings");
+ const API_BASE =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+    ? "http://localhost:5000"
+    : "https://mera-basera-backend.onrender.com";
+
+const res = await fetch(`${API_BASE}/api/listings`);
  if (!res.ok) throw new Error("Failed to fetch listings");
  const data = await res.json();
- console.log("LISTINGS FROM BACKEND:", data);
  setListings(data.map(row => ({
  id: row.id,
  college: row.collage,
