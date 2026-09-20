@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Mera Basera"
+description = "A polished student housing discovery landing page that helps students find verified rooms and PGs near their college with confidence."
+version = "1.0.0"
+id = "artifacts/mera-basera"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18997
+
+[services.development]
+run = "pnpm --filter @workspace/mera-basera run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mera-basera", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mera-basera/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18997"
+BASE_PATH = "/"
