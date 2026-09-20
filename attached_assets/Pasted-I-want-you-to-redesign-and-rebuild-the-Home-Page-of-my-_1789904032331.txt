@@ -1,0 +1,563 @@
+I want you to redesign and rebuild the Home Page of my existing Mera Basera project.
+
+IMPORTANT:
+Do NOT create a demo/prototype.
+Do NOT replace existing functionality with dummy/local functionality.
+Do NOT remove or break any existing working feature.
+Do NOT change backend architecture unless absolutely necessary.
+Do NOT change database schema.
+Do NOT change authentication logic.
+Do NOT remove Supabase integration.
+Do NOT remove the existing Express backend integration.
+
+I want you to use the professional Home Page design that you previously generated for me as the visual/design reference, but now integrate that design into the REAL existing Mera Basera application.
+
+PROJECT:
+Mera Basera is a student room/PG discovery platform.
+
+CURRENT TECH STACK:
+- React
+- Vite
+- JavaScript/JSX
+- React Router
+- Supabase Auth
+- Supabase database
+- Supabase Storage
+- Node.js + Express backend
+- PostgreSQL/Supabase
+- Existing production deployment
+
+The existing application already has working features. Your job is to redesign the Home Page while preserving all of them.
+
+==================================================
+1. FIRST — INSPECT THE EXISTING PROJECT
+==================================================
+
+Before modifying anything, inspect the entire existing project structure.
+
+Especially inspect:
+
+- src/pages/Home.jsx
+- src/App.jsx
+- src/main.jsx
+- src/App.css
+- src/index.css
+- ListingCard component
+- listing-related components
+- Dashboard.jsx
+- RegisterOwner.jsx
+- StudentPro.jsx
+- authentication/session logic
+- Supabase client configuration
+- API/backend listing fetch logic
+- existing routing
+- existing assets
+- package.json
+
+Also inspect the backend listing API if needed.
+
+Understand how the current Home Page actually works before changing it.
+
+DO NOT assume the old/demo Replit App.tsx architecture is compatible with this project.
+
+==================================================
+2. USE THE REPLIT DESIGN AS THE VISUAL REFERENCE
+==================================================
+
+The professional design I want is based on the Home Page design you previously generated.
+
+Use these visual concepts:
+
+- premium dark navy + warm gold color palette
+- professional real-estate/startup appearance
+- DM Sans for normal UI text
+- Fraunces-style serif typography for major headings
+- large cinematic hero section
+- professional hero background image
+- "Trusted by Students. Verified by Us." trust badge
+- large headline:
+  "Find a home away from home near your college"
+- college/university search bar
+- suggestion chips
+- feature highlights
+- statistics section
+- popular cities section
+- how-it-works section
+- testimonial section
+- owner CTA section
+- professional footer
+- responsive mobile design
+- subtle animations and hover effects
+- clean spacing
+- polished cards
+- modern shadows and borders
+
+The design should feel like a serious, trustworthy startup/product rather than a basic college project.
+
+==================================================
+3. VERY IMPORTANT — PRESERVE REAL FUNCTIONALITY
+==================================================
+
+The new Home Page MUST continue using the existing real functionality.
+
+Do NOT replace real functionality with:
+
+- hardcoded listings
+- fake search results
+- fake login buttons
+- fake signup notices
+- fake owner buttons
+- fake statistics presented as real data
+- dummy API calls
+- local-only search state
+
+The Home Page must remain connected to the actual application.
+
+==================================================
+4. REAL COLLEGE SEARCH
+==================================================
+
+The hero search bar must use the existing Mera Basera listing/search logic.
+
+When a user searches for a college:
+
+Example:
+- Ambalika University
+- Lucknow University
+- IIT Kanpur
+
+the search should trigger the EXISTING listing filtering/search system.
+
+It must display the actual listings returned by the existing backend/API.
+
+Preserve:
+
+- existing listing fetch
+- college filtering
+- room filtering
+- rent filtering
+- distance filtering
+- amenities filtering
+- verified filtering
+- premium filtering
+- existing paid-plan access logic
+
+Do not create a second independent search system.
+
+If the existing Home.jsx already has working search/filter logic, reuse/refactor that logic instead of replacing it.
+
+==================================================
+5. EXISTING LISTING CARDS
+==================================================
+
+Keep the existing Mera Basera listing cards and their real functionality.
+
+Do NOT replace them with the static demo cards from the reference design.
+
+Preserve:
+
+- real listing data
+- room photos
+- rent
+- room type
+- distance
+- amenities
+- verified badge
+- premium badge
+- favorites
+- listing details
+- existing detail popup/page
+- contact/enquiry functionality if already implemented
+
+The new Home Page should visually integrate these real listing cards into the new professional design.
+
+==================================================
+6. LOGIN / SIGNUP
+==================================================
+
+The navbar must use the EXISTING authentication system.
+
+Do NOT create fake buttons such as:
+
+"Student accounts are coming soon."
+
+Instead:
+
+- Login should open/use the existing login flow.
+- Sign Up should use the existing registration flow.
+- If the user is already logged in, preserve the existing logged-in navbar behavior.
+- Preserve student/owner roles.
+- Preserve logout functionality.
+
+Do not modify Supabase authentication unless required for integration.
+
+==================================================
+7. OWNER FLOW
+==================================================
+
+The "Are you an owner?" CTA must use the EXISTING owner flow.
+
+Do NOT show a fake "Owner listings are opening soon" message.
+
+It should navigate to/use the existing owner registration/login functionality.
+
+Preserve:
+
+- Owner registration
+- owner authentication
+- listing creation
+- photo upload
+- Owner Dashboard
+- listing editing
+- listing deletion
+- existing owner API
+
+==================================================
+8. FAVORITES
+==================================================
+
+Preserve the existing favorite functionality.
+
+Users should still be able to:
+
+- favorite listings
+- unfavorite listings
+- see their favorites
+- have favorites persist through Supabase
+
+Do not replace this with localStorage-only behavior.
+
+==================================================
+9. STUDENT STANDARD/PREMIUM
+==================================================
+
+Do not break the existing Student Standard/Premium system.
+
+Current plans:
+
+FREE
+STANDARD — ₹49/month
+PREMIUM — ₹99/month
+
+Preserve the existing subscription checks.
+
+Existing paid-plan functionality should continue working.
+
+Do not implement a new payment gateway.
+
+Payment gateway will be added later.
+
+==================================================
+10. STATS SECTION
+==================================================
+
+The reference design contains:
+
+- 2,400+ verified rooms
+- 18 cities
+- 4.8/5 satisfaction
+- ₹0 to start
+
+DO NOT blindly present these as real production statistics if they are not currently backed by the database.
+
+Instead, do one of these:
+
+A) If real values can safely be calculated from the existing database/API, use real values.
+
+OR
+
+B) Clearly present them as product/value statements rather than misleading production statistics.
+
+Do NOT fabricate business metrics.
+
+==================================================
+11. POPULAR CITIES
+==================================================
+
+Create a professional Popular Cities section inspired by the reference design.
+
+Possible cities:
+
+- Lucknow
+- Kanpur
+- New Delhi
+- Jaipur
+- Pune
+
+But city cards should connect to the actual search functionality.
+
+When the user clicks a city, it should use the existing listing/search system to show relevant listings.
+
+Do not create fake city pages unless routing already exists.
+
+==================================================
+12. HOW IT WORKS
+==================================================
+
+Create a professional "How it works" section.
+
+Example structure:
+
+01 — Search your college
+02 — Explore verified rooms
+03 — Compare & choose
+04 — Connect with the owner
+
+Keep the design premium and simple.
+
+This section is informational and does not need fake backend functionality.
+
+==================================================
+13. TESTIMONIALS
+==================================================
+
+Keep the testimonial section visually professional.
+
+If real testimonials already exist in Supabase, use the existing feedback/testimonial system.
+
+Do not invent fake user testimonials and present them as real.
+
+If there are no approved testimonials available, use a neutral empty/fallback state or clearly-marked sample content rather than pretending it is a real customer quote.
+
+==================================================
+14. OWNER CTA
+==================================================
+
+Create a professional section encouraging property owners to list their rooms/PGs.
+
+Example concept:
+
+"Have a room or PG for students?"
+
+CTA:
+"List your property"
+
+The button must use the existing owner registration flow.
+
+==================================================
+15. FOOTER
+==================================================
+
+Create a professional footer with sections such as:
+
+Explore
+- Find Rooms
+- Popular Colleges
+- Popular Cities
+
+Company
+- About
+- Contact
+- Feedback
+
+Social links if they already exist.
+
+Do not add broken links.
+
+If a page does not exist, do not create a fake route just for the footer.
+
+==================================================
+16. RESPONSIVE DESIGN
+==================================================
+
+This is extremely important.
+
+The Home Page must work properly on:
+
+- desktop
+- laptop
+- tablet
+- mobile
+
+Test:
+
+- 320px
+- 375px
+- 390px
+- 430px
+- 768px
+- 1024px
+- 1280px+
+ 
+Mobile navbar should become a proper mobile menu.
+
+Hero heading must not overflow.
+
+Search bar must stack properly on mobile.
+
+Cards must become single-column where necessary.
+
+No horizontal scrolling.
+
+==================================================
+17. PERFORMANCE
+==================================================
+
+Keep the Home Page performant.
+
+Do not unnecessarily add huge dependencies.
+
+Do not introduce a new UI framework if the project already has a working styling system.
+
+Reuse existing dependencies wherever possible.
+
+Images should be optimized appropriately.
+
+Avoid unnecessary API requests.
+
+Avoid unnecessary React re-renders.
+
+==================================================
+18. ROUTING
+==================================================
+
+Preserve the current React Router configuration.
+
+Do NOT replace React Router with Wouter.
+
+Do NOT rewrite the entire application routing architecture.
+
+Only update Home Page-related navigation where required.
+
+==================================================
+19. FILE STRUCTURE
+==================================================
+
+Use the existing project architecture.
+
+You may create small reusable components if they make the Home Page cleaner, for example:
+
+- HomeHero
+- HomeStats
+- PopularCities
+- HowItWorks
+- OwnerCTA
+- HomeFooter
+
+But do not over-engineer.
+
+If a component already exists, reuse it.
+
+==================================================
+20. CSS / DESIGN
+==================================================
+
+Use the provided professional design as the visual reference.
+
+Important design characteristics:
+
+- dark navy #081225-style hero
+- warm gold accent
+- cream/off-white page backgrounds
+- rounded cards
+- subtle borders
+- professional shadows
+- serif display headings
+- clean sans-serif body text
+- generous whitespace
+- subtle hover animations
+- premium startup aesthetic
+
+The hero should use a suitable local asset if one already exists.
+
+If hero-residence.jpg or equivalent asset exists in the project, use it.
+
+Do NOT hotlink random external images.
+
+If an asset is required, tell me exactly which file needs to be added.
+
+==================================================
+21. DO NOT BREAK CURRENT FUNCTIONALITY
+==================================================
+
+After implementation, verify all of these:
+
+[ ] Home Page loads
+[ ] Navbar works
+[ ] Login works
+[ ] Signup works
+[ ] Logout works
+[ ] College search works
+[ ] Real listings appear
+[ ] Listing cards work
+[ ] Listing details work
+[ ] Favorites work
+[ ] Advanced filters work
+[ ] Verified filter works
+[ ] Premium/paid-plan restrictions still work
+[ ] Owner CTA works
+[ ] Owner registration works
+[ ] Mobile layout works
+[ ] Existing routes still work
+[ ] Dashboard still works
+[ ] Student Standard/Premium page still works
+[ ] No console errors
+[ ] No broken imports
+[ ] No broken images
+[ ] Production build succeeds
+
+==================================================
+22. BUILD CHECK
+==================================================
+
+After completing the implementation, run:
+
+npm run build
+
+If the build fails:
+
+- inspect the actual error
+- fix it
+- run npm run build again
+
+Do not stop at the first error.
+
+Also check for:
+
+- missing imports
+- unused/broken imports
+- incorrect JSX
+- routing errors
+- CSS conflicts
+- mobile overflow
+
+==================================================
+23. IMPORTANT SAFETY / BACKUP
+==================================================
+
+Before making changes:
+
+1. Inspect the current git status.
+2. Do NOT delete existing working files.
+3. Do NOT overwrite unrelated features.
+4. Create a backup of the current Home Page files if appropriate.
+
+Do NOT commit or push to GitHub automatically.
+
+I want to review the changes first.
+
+==================================================
+24. FINAL RESPONSE
+==================================================
+
+When finished, tell me:
+
+1. Exactly which files you changed.
+2. Exactly which new files you created.
+3. What existing functionality you preserved.
+4. Any functionality you could not preserve.
+5. Whether npm run build passed.
+6. Whether any warnings remain.
+7. Whether any new assets/dependencies are required.
+
+Do not just say "done".
+
+The goal is:
+
+REPLIT PROFESSIONAL DESIGN
++
+REAL MERA BASERA FUNCTIONALITY
+=
+PRODUCTION-READY HOME PAGE
+
+Do NOT turn my existing Mera Basera into a static demo.
