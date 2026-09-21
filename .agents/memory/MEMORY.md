@@ -1,0 +1,1 @@
+- [Artifact build environment](artifact-build-environment.md) — standalone Vite builds need the artifact workflow's PORT and BASE_PATH values.

@@ -110,9 +110,12 @@ export default function Home({ onNeedAuth }) {
 
   async function loadListings() {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://mera-basera-backend.onrender.com';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+      const listingsUrl = API_BASE
+        ? `${API_BASE.replace(/\/$/, '')}/api/listings`
+        : '/api/listings';
 
-      const res = await fetch(`${API_BASE}/api/listings`);
+      const res = await fetch(listingsUrl);
       if (!res.ok) throw new Error('Failed to fetch listings');
       const data = await res.json();
       setListings(data.map((row) => ({
