@@ -1,0 +1,724 @@
+
+
+/* Pro Advanced Filters */
+.pro-filters {
+  margin: 18px 0 22px;
+  padding: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 14px;
+  background: rgba(99, 102, 241, 0.06);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.pro-filter-title {
+  width: 100%;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.pro-filters input[type="number"],
+.pro-filters select {
+  min-height: 42px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+}
+
+.pro-checkbox-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pro-checkbox-filter input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.amenities-filter {
+ width: 100%;
+ display: grid;
+ grid-template-columns: repeat(4, minmax(0, 1fr));
+ gap: 10px 14px;
+ padding-top: 10px;
+ max-height: 260px;
+ overflow-y: auto;
+ padding-right: 6px;
+}
+
+.amenities-title {
+ grid-column: 1 / -1;
+ width: 100%;
+ font-weight: 600;
+ margin-bottom: 2px;
+}
+
+.amenity-group {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.amenity-group-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.amenity-group-items {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.amenity-group-items label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.amenity-group-items label:hover {
+  background: #fff;
+}
+
+.amenity-group-items input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .amenity-group-items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .amenity-group-items {
+    grid-template-columns: 1fr;
+  }
+}
+
+.amenities-filter label {
+ display: flex;
+ align-items: center;
+ gap: 7px;
+ font-size: 14px;
+ cursor: pointer;
+ padding: 7px 8px;
+ border-radius: 8px;
+ background: rgba(255, 255, 255, 0.75);
+}
+
+.amenities-filter label:hover { background: #fff; }
+
+.amenities-filter input[type="checkbox"] {
+ cursor: pointer;
+ width: 16px;
+ height: 16px;
+}
+
+@media (max-width: 900px) {
+ .amenities-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+ .amenities-filter { grid-template-columns: 1fr; }
+}
+
+/* ================================
+   STUDENT PRO PAGE
+================================ */
+
+.student-pro-page {
+  min-height: 100vh;
+  padding: 70px 20px 80px;
+  background: #f7f7f7;
+  color: #111;
+}
+
+.student-pro-hero {
+  max-width: 900px;
+  margin: 0 auto 55px;
+  text-align: center;
+}
+
+.student-pro-badge {
+  display: inline-block;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  margin-bottom: 22px;
+}
+
+.student-pro-hero h1 {
+  margin: 0;
+  font-size: clamp(38px, 6vw, 68px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+.student-pro-hero h1 span {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.student-pro-hero p {
+  max-width: 650px;
+  margin: 22px auto 30px;
+  color: #666;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.student-pro-main-btn,
+.student-pro-upgrade-btn,
+.student-pro-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 800;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.student-pro-main-btn {
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  font-size: 15px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .12);
+}
+
+.student-pro-main-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+}
+
+.student-pro-active {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 12px;
+  background: #e8f7ed;
+  color: #17723a;
+  font-weight: 800;
+}
+
+.student-pro-plans {
+  width: min(1050px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  align-items: stretch;
+}
+
+.student-pro-plan {
+  position: relative;
+  padding: 34px;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, .06);
+}
+
+.student-pro-plan.pro-plan {
+  border: 2px solid #111;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, .12);
+}
+
+.pro-popular {
+  position: absolute;
+  top: -14px;
+  left: 25px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .5px;
+}
+
+.plan-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.plan-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #777;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+
+.pro-plan .plan-label {
+  color: #111;
+}
+
+.plan-header h2 {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 900;
+}
+
+.current-plan {
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: #eee;
+  color: #333;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.pro-current {
+  background: #111;
+  color: #fff;
+}
+
+.plan-price {
+  margin-top: 28px;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.plan-price span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #777;
+  letter-spacing: 0;
+}
+
+.plan-description {
+  min-height: 48px;
+  margin: 12px 0 24px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-features li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  font-size: 14px;
+}
+
+.plan-features li:last-child {
+  border-bottom: 0;
+}
+
+.student-pro-upgrade-btn {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 25px;
+  border-radius: 11px;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+}
+
+.student-pro-upgrade-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .15);
+}
+
+.student-pro-status {
+  width: min(1050px, 100%);
+  margin: 45px auto 0;
+}
+
+.student-pro-status h2 {
+  margin: 0 0 15px;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.student-pro-status-card {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 25px;
+  border-radius: 18px;
+  background: #111;
+  color: #fff;
+}
+
+.student-pro-status-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.student-pro-status-card span {
+  color: #aaa;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+}
+
+.student-pro-status-card strong {
+  font-size: 15px;
+}
+
+.student-pro-cta {
+  max-width: 750px;
+  margin: 65px auto 0;
+  text-align: center;
+}
+
+.student-pro-cta h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.student-pro-cta p {
+  margin: 12px auto 22px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.student-pro-secondary-btn {
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+}
+
+.student-pro-secondary-btn:hover {
+  background: #eee;
+}
+
+/* Student Pro responsive */
+
+@media (max-width: 760px) {
+  .student-pro-page {
+    padding: 45px 15px 60px;
+  }
+
+  .student-pro-hero h1 {
+    letter-spacing: -1px;
+  }
+
+  .student-pro-plans {
+    grid-template-columns: 1fr;
+  }
+
+  .student-pro-plan {
+    padding: 27px 22px;
+  }
+
+  .student-pro-status-card {
+    grid-template-columns: 1fr;
+  }
+
+  .student-pro-cta h2 {
+    font-size: 25px;
+  }
+}
+
+
+
+/* ================================
+   STUDENT PRO - PROFESSIONAL BACKGROUND
+================================ */
+
+.student-pro-page {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(35, 76, 130, 0.16), transparent 32%),
+    radial-gradient(circle at 85% 20%, rgba(70, 110, 170, 0.13), transparent 30%),
+    linear-gradient(135deg, #f5f7fb 0%, #eef3f9 48%, #f8f9fc 100%);
+}
+
+.student-pro-hero {
+  position: relative;
+}
+
+.student-pro-hero::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  top: 80px;
+  left: 5%;
+  border-radius: 50%;
+  background: rgba(30, 63, 110, 0.06);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.student-pro-hero::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  top: 40px;
+  right: 5%;
+  border-radius: 50%;
+  background: rgba(30, 63, 110, 0.05);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.student-pro-plan {
+  backdrop-filter: blur(4px);
+}
+
+.student-pro-plan.pro-plan {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: #172b4d;
+}
+
+.student-pro-badge {
+  box-shadow: 0 8px 25px rgba(15, 35, 65, 0.18);
+}
+
+.student-pro-main-btn {
+  background: #172b4d;
+}
+
+.student-pro-main-btn:hover {
+  background: #0e1e38;
+}
+
+.student-pro-upgrade-btn {
+  background: #172b4d;
+}
+
+.student-pro-upgrade-btn:hover {
+  background: #0e1e38;
+}
+
+.student-pro-status-card {
+  background: linear-gradient(135deg, #172b4d, #243f69);
+}
+
+/* =========================================
+   THREE-TIER STUDENT PLANS
+   FREE | STANDARD | PREMIUM
+========================================= */
+
+.student-pro-plans {
+  width: min(1250px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+.student-pro-plan {
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.student-pro-plan.pro-plan,
+.student-pro-plan.standard-plan {
+  border: 1px solid #dfe3e8;
+}
+
+.student-pro-plan.premium-plan {
+  border: 2px solid #172b4d;
+  box-shadow: 0 18px 45px rgba(23, 43, 77, 0.14);
+}
+
+.premium-popular {
+  position: absolute;
+  top: -14px;
+  left: 22px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: #172b4d;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+
+.premium-label {
+  color: #172b4d !important;
+}
+
+.premium-current {
+  background: #172b4d;
+  color: #fff;
+}
+
+.premium-features .feature-section {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 0;
+  color: #172b4d;
+}
+
+.premium-features .feature-section strong {
+  font-weight: 900;
+}
+
+.premium-upgrade-btn {
+  background: #172b4d;
+}
+
+.premium-upgrade-btn:hover {
+  background: #0d1c33;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 950px) {
+  .student-pro-plans {
+    grid-template-columns: 1fr;
+    max-width: 650px;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-pro-plans {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================
+   FINAL THREE-TIER PRICING DESIGN
+========================================= */
+
+.student-pro-plans {
+  width: min(1250px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.student-pro-plan {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 32px 28px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #dfe3e8;
+  box-shadow: 0 10px 30px rgba(20, 35, 55, 0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-pro-plan:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(20, 35, 55, 0.11);
+}
+
+.student-pro-plan.premium-plan {
+  border: 2px solid #172b4d;
+  box-shadow: 0 18px 45px rgba(23, 43, 77, 0.15);
+}
+
+.student-pro-plan .plan-features {
+  flex: 1;
+}
+
+.premium-popular {
+  top: -15px;
+  left: 22px;
+  background: #172b4d;
+}
+
+.premium-features .feature-section {
+  margin-top: 10px;
+  padding-top: 15px;
+  color: #172b4d;
+  border-top: 1px solid #e5e8ed;
+  border-bottom: 0;
+}
+
+.premium-features .feature-section strong {
+  font-weight: 900;
+}
+
+.premium-upgrade-btn {
+  margin-top: 25px;
+  background: #172b4d;
+}
+
+.premium-upgrade-btn:hover {
+  background: #0d1c33;
+}
+
+.standard-upgrade-btn {
+  margin-top: 25px;
+}
+
+/* Desktop: all three plans stay in one row */
+@media (min-width: 951px) {
+  .student-pro-plan {
+    min-height: 620px;
+  }
+}
+
+/* Tablet / Mobile */
+@media (max-width: 950px) {
+  .student-pro-plans {
+    grid-template-columns: 1fr;
+    max-width: 650px;
+  }
+
+  .student-pro-plan {
+    min-height: auto;
+  }
+}
+
