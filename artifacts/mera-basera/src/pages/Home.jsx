@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { sb } from '../lib/supabase';
 import { useAuth } from '../lib/AuthContext';
@@ -71,6 +71,9 @@ export default function Home({ onNeedAuth }) {
   const [fbForm, setFbForm] = useState({ name: '', role: 'Student', message: '' });
   const [fbOpen, setFbOpen] = useState(false);
   const [fbSuccess, setFbSuccess] = useState(false);
+  const [fbSubmitting, setFbSubmitting] = useState(false);
+  const [fbError, setFbError] = useState('');
+  const fbSubmitLock = useRef(false);
 
   useEffect(() => {
     async function loadSubscription() {
@@ -212,15 +215,54 @@ export default function Home({ onNeedAuth }) {
 
   async function submitFeedback(event) {
     event.preventDefault();
-    const { error } = await sb.from('feedback').insert({ ...fbForm, approved: false });
+    if (fbSubmitLock.current) return;
 
-    if (error) {
-      console.error('Feedback submit error:', error);
+    const name = fbForm.name.trim();
+    const message = fbForm.message.trim();
+    if (!name || !message) {
+      setFbError('Please enter your name and feedback before submitting.');
       return;
     }
 
-    setFbSuccess(true);
-    setFbForm({ name: '', role: 'Student', message: '' });
+    fbSubmitLock.current = true;
+    setFbSubmitting(true);
+    setFbError('');
+
+    try {
+      const { error } = await sb.from('feedback').insert({
+        ...fbForm,
+        name,
+        message,
+        approved: false,
+      });
+
+      if (error) {
+        console.error('Feedback submit error:', error);
+        setFbError('We couldn’t submit your feedback. Please try again.');
+        return;
+      }
+
+      setFbSuccess(true);
+      setFbForm({ name: '', role: 'Student', message: '' });
+    } catch (error) {
+      console.error('Feedback submit error:', error);
+      setFbError('We couldn’t submit your feedback. Please try again.');
+    } finally {
+      fbSubmitLock.current = false;
+      setFbSubmitting(false);
+    }
+  }
+
+  function openFeedback() {
+    setFbError('');
+    setFbSuccess(false);
+    setFbOpen(true);
+  }
+
+  function closeFeedback() {
+    setFbOpen(false);
+    setFbSuccess(false);
+    setFbError('');
   }
 
   const isPro = ['standard', 'premium'].includes(subscription?.plan) && subscription?.status === 'active';
@@ -511,7 +553,7 @@ export default function Home({ onNeedAuth }) {
         <div className="mb-container">
           <div className="mb-section-heading">
             <div><span className="mb-eyebrow">From the community</span><h2>What people are saying.</h2></div>
-            <button className="mb-outline-button" type="button" onClick={() => setFbOpen(true)}>Share feedback <span aria-hidden="true">↗</span></button>
+            <button className="mb-outline-button" type="button" onClick={openFeedback}>Share feedback <span aria-hidden="true">↗</span></button>
           </div>
           <div className="mb-testimonial-grid">
             {feedback.length === 0 ? (
@@ -540,7 +582,7 @@ export default function Home({ onNeedAuth }) {
           <div><Link className="mb-brand mb-footer-brand" to="/"><span className="mb-brand-mark">M</span><span className="mb-brand-copy"><span className="mb-brand-name">Mera Basera</span><span className="mb-brand-sub">Student room &amp; PG finder</span></span></Link><p>A little less searching. A lot more feeling at home. Find real rooms near college with the tools you already use.</p></div>
           <div><h3>Explore</h3><a href="#results">Find rooms</a><a href="#cities">Popular cities</a><a href="#how-it-works">How it works</a></div>
           <div><h3>For owners</h3><Link to="/register-owner">Register a room</Link><Link to="/owner-dashboard">Owner dashboard</Link><Link to="/dashboard">Your dashboard</Link></div>
-          <div><h3>Community</h3><button type="button" onClick={() => setFbOpen(true)}>Give feedback</button><button type="button" onClick={() => setRoommateOpen(true)}>Find a roommate</button><a href="#top">Back to top ↑</a></div>
+          <div><h3>Community</h3><button type="button" onClick={openFeedback}>Give feedback</button><button type="button" onClick={() => setRoommateOpen(true)}>Find a roommate</button><a href="#top">Back to top ↑</a></div>
         </div>
         <div className="mb-container mb-footer-bottom"><span>© 2025 Mera Basera. Made for the move.</span><span>Built with care in India.</span></div>
       </footer>
@@ -549,21 +591,24 @@ export default function Home({ onNeedAuth }) {
       <RoommateModal open={roommateOpen} onClose={() => setRoommateOpen(false)} onNeedAuth={onNeedAuth} />
 
       {fbOpen && (
-        <div className="overlay open" onClick={(event) => event.target === event.currentTarget && setFbOpen(false)}>
+        <div className="overlay open" onClick={(event) => event.target === event.currentTarget && !fbSubmitting && closeFeedback()}>
           <div className="modal mb-feedback-modal">
-            <button className="modal-close" onClick={() => { setFbOpen(false); setFbSuccess(false); }}>✕</button>
+            <button className="modal-close" disabled={fbSubmitting} onClick={closeFeedback}>✕</button>
             <div className="modal-head"><div className="room-type">FEEDBACK</div><h2>Tell us what you think</h2><div className="locality">We read every message — good or bad</div></div>
             {!fbSuccess ? (
               <div className="modal-body">
-                <form onSubmit={submitFeedback}>
+                {fbError && <p className="mb-feedback-error" role="alert">{fbError}</p>}
+                <form onSubmit={submitFeedback} noValidate>
                   <div className="form-group"><label>Your name</label><input required value={fbForm.name} onChange={(event) => setFbForm({ ...fbForm, name: event.target.value })} placeholder="e.g. Ayush Sharma" /></div>
                   <div className="form-group"><label>You are a</label><select value={fbForm.role} onChange={(event) => setFbForm({ ...fbForm, role: event.target.value })}><option value="Student">Student</option><option value="Room/PG Owner">Room/PG Owner</option></select></div>
                   <div className="form-group"><label>Your feedback</label><textarea required value={fbForm.message} onChange={(event) => setFbForm({ ...fbForm, message: event.target.value })} placeholder="What did you think of Mera Basera?" rows="4" /></div>
-                  <button type="submit" className="btn-submit">Submit feedback</button>
+                  <button type="submit" className="btn-submit" disabled={fbSubmitting}>
+                    {fbSubmitting ? 'Submitting…' : 'Submit feedback'}
+                  </button>
                 </form>
               </div>
             ) : (
-              <div className="form-success show"><div className="tick">✓</div><h3>Thank you!</h3><p>Your feedback has been recorded for review.</p><button className="btn-submit" style={{ marginTop: 20 }} onClick={() => { setFbOpen(false); setFbSuccess(false); }}>Got it</button></div>
+              <div className="form-success show"><div className="tick">✓</div><h3>Thank you!</h3><p>Your feedback has been recorded for review.</p><button className="btn-submit" style={{ marginTop: 20 }} onClick={closeFeedback}>Got it</button></div>
             )}
           </div>
         </div>

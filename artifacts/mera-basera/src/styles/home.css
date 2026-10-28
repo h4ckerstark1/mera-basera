@@ -967,6 +967,24 @@
   font: .92rem var(--mb-sans);
 }
 
+.mb-feedback-error {
+  margin: 0 0 15px;
+  padding: 10px 12px;
+  border: 1px solid rgba(153, 27, 27, .2);
+  border-left: 3px solid #a82d24;
+  border-radius: 7px;
+  background: #fff3f1;
+  color: #84251f;
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.mb-feedback-modal .btn-submit:disabled,
+.mb-feedback-modal .modal-close:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
 @keyframes mb-rise {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
