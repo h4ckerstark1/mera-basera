@@ -575,6 +575,28 @@
   font-size: .78rem;
 }
 
+.mb-retry-button {
+  margin-top: 20px;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--mb-gold);
+  color: var(--mb-navy);
+  cursor: pointer;
+  font: 700 .78rem var(--mb-sans);
+  transition: background .2s ease, transform .2s ease;
+}
+
+.mb-retry-button:hover {
+  background: var(--mb-gold-bright);
+  transform: translateY(-2px);
+}
+
+.mb-retry-button:focus-visible {
+  outline: 3px solid var(--mb-navy);
+  outline-offset: 3px;
+}
+
 .mb-value-band {
   background: var(--mb-navy);
   color: white;

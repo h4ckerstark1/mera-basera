@@ -50,6 +50,7 @@ function FeatureIcon({ children }) {
 export default function Home({ onNeedAuth }) {
   const { user } = useAuth();
   const [listings, setListings] = useState([]);
+  const [listingsStatus, setListingsStatus] = useState('loading');
   const [query, setQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [budget, setBudget] = useState('');
@@ -109,6 +110,8 @@ export default function Home({ onNeedAuth }) {
   }, [user]);
 
   async function loadListings() {
+    setListingsStatus('loading');
+
     try {
       const API_BASE = import.meta.env.VITE_API_BASE_URL;
       const listingsUrl = API_BASE
@@ -116,8 +119,12 @@ export default function Home({ onNeedAuth }) {
         : '/api/listings';
 
       const res = await fetch(listingsUrl);
-      if (!res.ok) throw new Error('Failed to fetch listings');
+      if (!res.ok) throw new Error(`Failed to fetch listings (HTTP ${res.status})`);
       const data = await res.json();
+      if (!Array.isArray(data) || data.some((row) => !row || typeof row !== 'object' || Array.isArray(row))) {
+        throw new Error('Listings response must be an array of listing objects');
+      }
+
       setListings(data.map((row) => ({
         id: row.id,
         college: row.collage,
@@ -134,9 +141,11 @@ export default function Home({ onNeedAuth }) {
         phone: row.phone || '',
         photoUrl: row.photo_url || null,
       })));
+      setListingsStatus('success');
     } catch (error) {
       console.error('Failed to load listings:', error);
       setListings([]);
+      setListingsStatus('error');
     }
   }
 
@@ -238,12 +247,24 @@ export default function Home({ onNeedAuth }) {
     runSearch(name);
   }
 
+  const hasActiveFilters = Boolean(
+    budget ||
+    roomType ||
+    verifiedOnly ||
+    minRent ||
+    maxRent ||
+    (isPro && (premiumVerified || maxDistance || selectedAmenities.length > 0))
+  );
+  const hasSearchCriteria = Boolean(query || hasActiveFilters);
+
   let filtered = query
     ? listings.filter((listing) => (
       String(listing.college || '').toLowerCase().includes(query.toLowerCase()) ||
       String(listing.city || '').toLowerCase().includes(query.toLowerCase())
     ))
-    : [];
+    : hasActiveFilters
+      ? listings
+      : [];
 
   if (budget) filtered = filtered.filter((listing) => listing.rent <= parseInt(budget, 10));
   if (roomType) filtered = filtered.filter((listing) => listing.type === roomType);
@@ -312,7 +333,17 @@ export default function Home({ onNeedAuth }) {
               <span className="mb-eyebrow">Live listings, less noise</span>
               <h2>{query ? `Rooms near “${query}”` : 'Start with your college'}</h2>
             </div>
-            <p>{query ? `${filtered.length} matching listing${filtered.length === 1 ? '' : 's'} from the live database` : 'Search a college or city above to see actual rooms and PGs.'}</p>
+            <p>
+              {listingsStatus === 'loading'
+                ? 'Loading live listings…'
+                : listingsStatus === 'error'
+                  ? 'Live listings could not be loaded.'
+                  : listings.length === 0
+                    ? 'No listings are available yet.'
+                    : hasSearchCriteria
+                      ? `${filtered.length} matching listing${filtered.length === 1 ? '' : 's'} from the live database`
+                      : 'Search a college or city above to see actual rooms and PGs.'}
+            </p>
           </div>
 
           <div className="mb-filter-row">
@@ -381,7 +412,26 @@ export default function Home({ onNeedAuth }) {
           )}
 
           <div className="mb-listing-grid">
-            {!query ? (
+            {listingsStatus === 'loading' ? (
+              <div className="mb-search-prompt" role="status" aria-live="polite">
+                <span className="mb-prompt-mark" aria-hidden="true">…</span>
+                <h3>Loading live listings…</h3>
+                <p>We’re fetching the latest rooms and PGs. Please wait a moment.</p>
+              </div>
+            ) : listingsStatus === 'error' ? (
+              <div className="mb-search-prompt" role="alert">
+                <span className="mb-prompt-mark" aria-hidden="true">!</span>
+                <h3>We couldn’t load the listings.</h3>
+                <p>Please check your connection and try again. No listings are being shown as search results.</p>
+                <button className="mb-retry-button" type="button" onClick={loadListings}>Retry</button>
+              </div>
+            ) : listings.length === 0 ? (
+              <div className="mb-search-prompt">
+                <span className="mb-prompt-mark" aria-hidden="true">⌂</span>
+                <h3>No listings are available yet.</h3>
+                <p>Please check back soon for rooms and PGs near your college.</p>
+              </div>
+            ) : !hasSearchCriteria ? (
               <div className="mb-search-prompt">
                 <span className="mb-prompt-mark">⌕</span>
                 <h3>Your next room starts with a search.</h3>
