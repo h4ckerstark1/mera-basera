@@ -1,0 +1,3 @@
+[build]
+  command = "pnpm --filter @workspace/mera-basera run build"
+  publish = "artifacts/mera-basera/dist/public"
